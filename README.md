@@ -61,7 +61,7 @@ The pipeline saves figures under `outputs/figures/`. Below are example outputs f
 
 ### Region CTR comparison
 
-Horizontal bars of CTR for the top regions (by click volume). I use it to spot geographic pockets of strong or weak engagement.
+A **lollipop chart** of CTR for the regions with the most clicks (top *N* by volume, then ordered by CTR). I use it to compare relative click rates without relying on a categorical bar axis.
 
 ![Region CTR comparison](docs/readme/top_regions_ctr.png)
 

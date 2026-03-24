@@ -5,6 +5,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -21,29 +22,41 @@ def _save(fig: plt.Figure, output_path: Path | str | None) -> None:
 
 
 def plot_top_regions(summary: pd.DataFrame, output_path: Path | str | None = None, top_n: int = 15) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(12, 8))
-    ordered = summary.sort_values("clicks", ascending=False).head(top_n).copy()
-    # Seaborn treats numeric `y` as a continuous axis; region codes must be categorical strings.
-    if "city" in ordered.columns and ordered["region"].duplicated().any():
-        ordered["region_label"] = ordered["region"].astype(str).str.cat(ordered["city"].astype(str), sep=" · ")
+    """Ranked regions (by click volume) with CTR as a horizontal lollipop chart (matplotlib only)."""
+    pool = summary.sort_values("clicks", ascending=False).head(top_n).copy()
+    if "city" in pool.columns and pool["region"].duplicated().any():
+        pool["region_label"] = pool["region"].astype(str).str.cat(pool["city"].astype(str), sep=" · ")
     else:
-        ordered["region_label"] = ordered["region"].astype(str)
-    order = ordered.sort_values("ctr", ascending=True)["region_label"].tolist()
-    sns.barplot(
-        data=ordered,
-        x="ctr",
-        y="region_label",
-        order=order,
-        hue="region_label",
-        dodge=False,
-        legend=False,
-        ax=ax,
-        palette="Blues_r",
-    )
-    ax.set_title(f"Top {top_n} Regions by CTR")
+        pool["region_label"] = pool["region"].astype(str)
+
+    plot_df = pool.sort_values("ctr", ascending=True).reset_index(drop=True)
+    n = len(plot_df)
+    if n == 0:
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.set_title("Top Regions by CTR")
+        ax.text(0.5, 0.5, "No region rows available", ha="center", va="center")
+        ax.set_axis_off()
+        _save(fig, output_path)
+        return fig
+
+    ctr = plot_df["ctr"].to_numpy(dtype=float)
+    labels = plot_df["region_label"].tolist()
+    y_pos = np.arange(n)
+    height = max(6.0, 0.42 * n)
+
+    fig, ax = plt.subplots(figsize=(12, height))
+    ax.hlines(y=y_pos, xmin=0.0, xmax=ctr, color="#cbd5e1", linewidth=2.0, zorder=1)
+    ax.scatter(ctr, y_pos, color="#1d4ed8", s=110, zorder=3, edgecolors="white", linewidths=1.5)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels)
     ax.set_xlabel("CTR")
     ax.set_ylabel("Region")
+    ax.set_title(f"Top {n} Regions by CTR (selected by click volume)")
     ax.xaxis.set_major_formatter(lambda value, _: f"{value:.2%}")
+    ax.set_xlim(left=0.0)
+    ax.grid(True, axis="x", linestyle="--", alpha=0.35)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     _save(fig, output_path)
     return fig
 
