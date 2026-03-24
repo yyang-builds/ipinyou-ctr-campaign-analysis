@@ -1,6 +1,6 @@
 # iPinYou CTR & Campaign Performance Analysis
 
-This project is a portfolio-ready Python workflow for analyzing RTB campaign performance with the public iPinYou dataset. It combines business-facing performance analysis with CTR modeling so you can answer questions about which advertisers, creatives, exchanges, regions, and time windows perform best.
+I built this project as a portfolio-ready Python workflow for analyzing RTB campaign performance with the public iPinYou dataset. I combine business-facing performance analysis with CTR modeling so I can see which advertisers, creatives, exchanges, regions, and time windows perform best.
 
 ## Project Goals
 
@@ -54,6 +54,16 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 - Which exchanges show better win rates or lower effective CPC?
 - How does `bidprice` compare with `payprice`, and where might spend be inefficient?
 - Which features are most associated with higher click probability?
+
+## Visualizations
+
+The pipeline saves figures under `outputs/figures/`. Each chart highlights a different slice of performance:
+
+- **CTR by hour** — A line chart of CTR across hours of the day. I use it to see when users are most likely to click and how intraday patterns compare.
+- **Region CTR comparison** — Horizontal bars of CTR for the top regions (by click volume). I use it to spot geographic pockets of strong or weak engagement.
+- **eCPC by advertiser** — Effective CPC for the top advertisers (by clicks). I use it to compare which advertisers pay more per click given the same modeling window.
+- **Bid price vs pay price** — A scatter of bid vs clearing price on a sample of auctions. I use it to see how aggressive bids are relative to what was actually paid and where gaps cluster.
+- **Win rate by ad exchange** — Win rate per exchange. I use it to compare how often impressions clear by supply source and where competition or fill might differ.
 
 ## Project Structure
 
@@ -132,117 +142,9 @@ Evaluation metrics include:
 
 ### 5. Generalization experiments (optional)
 
-For portfolio-style reporting, use `run_ctr_experiments.py` to run:
+For portfolio-style reporting, I also run `run_ctr_experiments.py` to evaluate:
 
 - **Season 2 train / Season 3 test** — cross-season robustness (not the official leaderboard test).
 - **Within-season temporal split** on `training2nd` — early calendar days vs. later days in the same season.
 
 Framing, file outputs, and CLI flags are documented in [EXPERIMENTS.md](EXPERIMENTS.md).
-
-## Visualizations
-
-The pipeline is set up to create charts for:
-
-- CTR by hour
-- Region CTR comparison
-- eCPC by advertiser
-- Bid price vs pay price
-- Win rate by ad exchange
-
-Generated figures are saved to `outputs/figures/`.
-
-## Setup
-
-### 1. Create an environment
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e .
-```
-
-### 2. Add the dataset
-
-Place your iPinYou files under:
-
-```text
-data/raw/ipinyou.contest.dataset/
-```
-
-The pipeline expects the original season folders such as `training2nd/` and `training3rd/` to still be inside that directory.
-
-### 3. Run the pipeline
-
-```bash
-python run_pipeline.py
-```
-
-### 4. CTR generalization experiments (optional)
-
-```bash
-python run_ctr_experiments.py
-```
-
-See [EXPERIMENTS.md](EXPERIMENTS.md) for how cross-season and within-season splits are defined and what gets written under `data/processed/experiments/`.
-
-### Incremental mode (checkpoint per day)
-
-If a long run might be interrupted, use `--incremental`. After **each** calendar day (each `bid.*.txt.bz2` file), the pipeline:
-
-- Appends a Parquet chunk under `data/processed/incremental/chunks/`
-- Refreshes `dataset_profile.csv`, summary CSVs, and figures under `data/processed/` and `outputs/figures/`
-- Writes `data/processed/incremental/checkpoint.json` with completed days and row counts
-
-CTR models are trained **once at the end** by default (faster). Use `--model-each-checkpoint` to retrain after every day.
-
-```bash
-python run_pipeline.py --incremental --max-days 2 --max-rows-per-file 0
-```
-
-Outputs will be written to:
-
-- `data/processed/`
-- `outputs/figures/`
-
-By default, the script loads:
-
-- `training2nd`
-- `training3rd`
-- `1` day per season
-- up to `200000` rows per raw file
-
-This keeps the first run manageable. To process more data:
-
-```bash
-python run_pipeline.py --max-days 3 --max-rows-per-file 0
-```
-
-To run all available days from the selected seasons:
-
-```bash
-python run_pipeline.py --max-days 0 --max-rows-per-file 0
-```
-
-## Notebooks
-
-- `notebooks/01_eda_campaign_analysis.ipynb`
-- `notebooks/02_ctr_modeling.ipynb`
-
-These notebooks are intended for exploration, storytelling, and portfolio presentation. They use the reusable code from `src/ipinyou_analysis/`.
-
-## GitHub Readiness
-
-This repository is structured so you can upload it to GitHub cleanly:
-
-- large raw data is excluded with `.gitignore`
-- generated figures and processed data are excluded by default
-- source code and notebooks remain lightweight and shareable
-- the repository explains both business value and technical implementation
-
-## Next Improvements
-
-- Add region and city name mapping files for more readable charts
-- Add calibration plots for CTR probabilities
-- Add SHAP or permutation importance for model interpretation
-- Add campaign-specific deep dives if you work with individual advertiser folders
