@@ -49,7 +49,7 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 
 ## Business Questions
 
-These are the questions I designed the workflow around, and how I answer them with this repository (outputs depend on how much data you load).
+These are the questions I designed the workflow around, with short takeaways (outputs depend on how much data you load).
 
 ### Which campaigns and creatives drive the highest CTR?
 
@@ -59,17 +59,21 @@ These are the questions I designed the workflow around, and how I answer them wi
 
 **Answer:** **Hours:** I aggregate by `hour` via `segment_performance_summary(df, ["hour"])` in notebooks (see `notebooks/01_eda_campaign_analysis.ipynb`) and inspect **CTR** and volume per hour after `build_modeling_frame` / `add_auction_metrics`. **Regions:** **`region_summary.csv`** (from `segment_performance_summary(df, ["region"])`) gives **CTR**, **clicks**, and **impressions** per region so I can compare pockets of strong or weak engagement. There is no single “hour chart” in the default pipeline anymore, but the hour breakdown is a few lines of aggregation in a notebook.
 
+### Which advertisers pay the most per click (eCPC) among high-traffic campaigns?
+
+**Answer:** Among advertisers with the most clicks, a wide spread in eCPC means some brands buy clicks much more cheaply than others at similar scale. The chart makes that gap obvious so I do not confuse “big volume” with “efficient clicks.”
+
 ### Which exchanges show better win rates or lower effective CPC?
 
-**Answer:** **`exchange_summary.csv`** (grouped by `adexchange`) includes **win_rate** (wins per bid request) and **eCPC** (`spend / clicks`). **`win_rate_by_exchange.png`** visualizes win rate by exchange. **`campaign_ecpc.png`** is built from campaign-level summaries that include **adexchange**, so I can relate **eCPC** to exchange alongside advertiser. Comparing those tables and charts shows which exchanges clear more auctions and which are pricier per click for the same run.
+**Answer:** I usually see a trade-off: exchanges with higher win rates are not always the ones with the lowest eCPC, so I read them together instead of picking a “winner” on one metric alone.
 
 ### How does `bidprice` compare with `payprice`, and where might spend be inefficient?
 
-**Answer:** **`bid_vs_payprice.png`** plots **bid** vs **clearing (pay) price** on a sample of auctions. Points near the diagonal mean bids are close to what was paid; large gaps suggest bids well above clearing. In the summaries, **`pay_to_bid_ratio`** (`avg_payprice / avg_bidprice`) flags segments where clearing is low relative to the bid, which is a useful **spend-efficiency** lens together with **eCPC** and **CPM** in the same aggregate tables.
+**Answer:** When clearing price sits far below my bid, I am leaving money on the table relative to what the auction actually needed; tight alignment along the diagonal is the sanity check that my bids match market clearing.
 
 ### Which features are most associated with higher click probability?
 
-**Answer:** The **CTR models** (`train_ctr_models` → logistic regression and histogram gradient boosting) use engineered features such as **hour**, **weekday**, **region**, **city**, **exchange**, **slot** dimensions, **bid/pay** gaps, **device**, **browser**, and **user tag count** (see `features.py` and `modeling.py`). **`model_comparison.csv`** and the **model comparison** figures show **discriminative** quality on the validation set (ROC AUC, average precision, log loss, Brier score). This repo does **not** ship SHAP or coefficient tables by default; for **interpretability** I would add permutation importance or inspect logistic coefficients next—those metrics tell you whether the feature set is predictive, not which single feature ranks first without an extra interpretability step.
+**Answer:** The models show whether the feature set is predictive on held-out data, but this project stops short of ranking individual features—treating “what matters most” would take a separate interpretability pass beyond the headline metrics.
 
 ## Visualizations
 
