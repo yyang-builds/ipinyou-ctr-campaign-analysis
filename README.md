@@ -77,6 +77,14 @@ Win rate per exchange. I use it to compare how often impressions clear by supply
 
 ![Win rate by ad exchange](docs/readme/win_rate_by_exchange.png)
 
+### Model comparison (CTR)
+
+After training, I compare **logistic regression** and **histogram gradient boosting** on the validation split: a **2×2 bar chart** for ROC AUC, average precision, log loss, and Brier score, plus a **full metrics table** (including precision/recall at a mid PR threshold). The same numbers are in `data/processed/model_comparison.csv`.
+
+![Model comparison — metric bars](docs/readme/model_comparison_metrics.png)
+
+![Model comparison — table](docs/readme/model_comparison_table.png)
+
 ## Project Structure
 
 ```text
@@ -153,6 +161,8 @@ Evaluation metrics include:
 - Average precision
 - Log loss
 - Brier score
+
+Metrics are written to `data/processed/model_comparison.csv` and visualized as **`outputs/figures/model_comparison_metrics.png`** (bar chart grid) and **`outputs/figures/model_comparison_table.png`** (table figure).
 
 ### 5. Generalization experiments (optional)
 

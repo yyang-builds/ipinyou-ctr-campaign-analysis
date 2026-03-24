@@ -23,6 +23,8 @@ from ipinyou_analysis.modeling import evaluate_models, train_ctr_models
 from ipinyou_analysis.plotting import (
     plot_bid_vs_payprice,
     plot_campaign_ecpc,
+    plot_model_comparison_charts,
+    plot_model_comparison_table,
     plot_win_rate_by_exchange,
 )
 
@@ -92,10 +94,14 @@ def write_summaries_and_plots(df: pd.DataFrame, processed_dir: Path, figure_dir:
     plot_win_rate_by_exchange(exchange_summary, figure_dir / "win_rate_by_exchange.png")
 
 
-def write_model_comparison(df: pd.DataFrame, processed_dir: Path) -> None:
+def write_model_comparison(df: pd.DataFrame, processed_dir: Path, figure_dir: Path) -> None:
     modeling_df = build_modeling_frame(df)
     artifacts = train_ctr_models(modeling_df)
-    evaluate_models(artifacts).to_csv(processed_dir / "model_comparison.csv", index=False)
+    metrics = evaluate_models(artifacts)
+    metrics.to_csv(processed_dir / "model_comparison.csv", index=False)
+    figure_dir.mkdir(parents=True, exist_ok=True)
+    plot_model_comparison_charts(metrics, figure_dir / "model_comparison_metrics.png")
+    plot_model_comparison_table(metrics, figure_dir / "model_comparison_table.png")
 
 
 def run_incremental(
@@ -147,7 +153,7 @@ def run_incremental(
         (incremental_root / "checkpoint.json").write_text(json.dumps(checkpoint, indent=2), encoding="utf-8")
 
         if model_each_checkpoint:
-            write_model_comparison(df_cumulative, processed_dir)
+            write_model_comparison(df_cumulative, processed_dir, figure_dir)
 
     if not cumulative_frames:
         raise RuntimeError("Incremental run produced no data.")
@@ -155,7 +161,7 @@ def run_incremental(
     df_final = pd.concat(cumulative_frames, ignore_index=True, sort=False)
 
     if not model_each_checkpoint:
-        write_model_comparison(df_final, processed_dir)
+        write_model_comparison(df_final, processed_dir, figure_dir)
 
 
 def main() -> None:
@@ -188,7 +194,7 @@ def main() -> None:
         max_rows_per_file=max_rows,
     )
     write_summaries_and_plots(df, processed_dir, figure_dir)
-    write_model_comparison(df, processed_dir)
+    write_model_comparison(df, processed_dir, figure_dir)
 
 
 if __name__ == "__main__":
