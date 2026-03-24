@@ -1,6 +1,6 @@
 # iPinYou CTR & Campaign Performance Analysis
 
-I built this project as a portfolio-ready Python workflow for analyzing RTB campaign performance with the public iPinYou dataset. I combine business-facing performance analysis with CTR modeling so I can see which advertisers, creatives, exchanges, regions, and time windows perform best.
+I built this project as a Python workflow for analyzing RTB campaign performance with the public iPinYou dataset. I combine business-facing performance analysis with CTR modeling so I can see which advertisers, creatives, exchanges, regions, and time windows perform best.
 
 ## Project Goals
 

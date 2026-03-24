@@ -33,7 +33,8 @@ def plot_ctr_by_hour(summary: pd.DataFrame, output_path: Path | str | None = Non
 
 def plot_top_regions(summary: pd.DataFrame, output_path: Path | str | None = None, top_n: int = 15) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(12, 8))
-    ordered = summary.sort_values("clicks", ascending=False).head(top_n)
+    ordered = summary.sort_values("clicks", ascending=False).head(top_n).copy()
+    ordered["region"] = ordered["region"].astype(str)
     sns.barplot(data=ordered, x="ctr", y="region", hue="region", dodge=False, legend=False, ax=ax, palette="Blues_r")
     ax.set_title(f"Top {top_n} Regions by CTR")
     ax.set_xlabel("CTR")
@@ -45,11 +46,30 @@ def plot_top_regions(summary: pd.DataFrame, output_path: Path | str | None = Non
 
 def plot_campaign_ecpc(summary: pd.DataFrame, output_path: Path | str | None = None, top_n: int = 15) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(12, 8))
-    ordered = summary.sort_values("clicks", ascending=False).head(top_n)
-    sns.barplot(data=ordered, x="ecpc", y="advertiser", hue="advertiser", dodge=False, legend=False, ax=ax, palette="magma")
+    ordered = summary.sort_values("ecpc", ascending=False).head(top_n).copy()
+    # Seaborn treats numeric `y` as a continuous axis; advertiser IDs must be categorical strings.
+    if "creative" in ordered.columns and ordered["advertiser"].duplicated().any():
+        ordered["advertiser_label"] = (
+            ordered["advertiser"].astype(str).str.cat(ordered["creative"].astype(str), sep=" · ")
+        )
+    else:
+        ordered["advertiser_label"] = ordered["advertiser"].astype(str)
+    order = ordered.sort_values("ecpc", ascending=True)["advertiser_label"].tolist()
+    sns.barplot(
+        data=ordered,
+        x="ecpc",
+        y="advertiser_label",
+        order=order,
+        hue="advertiser_label",
+        dodge=False,
+        legend=False,
+        ax=ax,
+        palette="magma",
+    )
     ax.set_title(f"Top {top_n} Advertisers by eCPC")
     ax.set_xlabel("Effective CPC")
     ax.set_ylabel("Advertiser")
+    ax.xaxis.set_major_formatter(lambda value, _: f"{value:.2f}")
     _save(fig, output_path)
     return fig
 
@@ -74,7 +94,9 @@ def plot_bid_vs_payprice(df: pd.DataFrame, output_path: Path | str | None = None
 
 def plot_win_rate_by_exchange(summary: pd.DataFrame, output_path: Path | str | None = None) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(12, 6))
-    sns.barplot(data=summary, x="adexchange", y="win_rate", hue="adexchange", dodge=False, legend=False, ax=ax, palette="viridis")
+    frame = summary.copy()
+    frame["adexchange"] = frame["adexchange"].astype(str)
+    sns.barplot(data=frame, x="adexchange", y="win_rate", hue="adexchange", dodge=False, legend=False, ax=ax, palette="viridis")
     ax.set_title("Win Rate by Ad Exchange")
     ax.set_xlabel("Ad Exchange")
     ax.set_ylabel("Win Rate")
