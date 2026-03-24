@@ -23,7 +23,6 @@ from ipinyou_analysis.modeling import evaluate_models, train_ctr_models
 from ipinyou_analysis.plotting import (
     plot_bid_vs_payprice,
     plot_campaign_ecpc,
-    plot_ctr_by_hour,
     plot_top_regions,
     plot_win_rate_by_exchange,
 )
@@ -82,16 +81,13 @@ def write_summaries_and_plots(df: pd.DataFrame, processed_dir: Path, figure_dir:
     profile_dataset(df).to_csv(processed_dir / "dataset_profile.csv", index=False)
 
     campaign_summary = campaign_performance_summary(df)
-    hour_summary = segment_performance_summary(df, ["hour"])
     region_summary = segment_performance_summary(df, ["region"])
     exchange_summary = segment_performance_summary(df, ["adexchange"])
 
     campaign_summary.to_csv(processed_dir / "campaign_summary.csv", index=False)
-    hour_summary.to_csv(processed_dir / "hour_summary.csv", index=False)
     region_summary.to_csv(processed_dir / "region_summary.csv", index=False)
     exchange_summary.to_csv(processed_dir / "exchange_summary.csv", index=False)
 
-    plot_ctr_by_hour(hour_summary, figure_dir / "ctr_by_hour.png")
     plot_top_regions(region_summary, figure_dir / "top_regions_ctr.png")
     plot_campaign_ecpc(campaign_summary, figure_dir / "campaign_ecpc.png")
     plot_bid_vs_payprice(df, figure_dir / "bid_vs_payprice.png")

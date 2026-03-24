@@ -20,22 +20,26 @@ def _save(fig: plt.Figure, output_path: Path | str | None) -> None:
     fig.savefig(output_path, dpi=200, bbox_inches="tight")
 
 
-def plot_ctr_by_hour(summary: pd.DataFrame, output_path: Path | str | None = None) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.lineplot(data=summary, x="hour", y="ctr", marker="o", ax=ax, color="#2563eb")
-    ax.set_title("CTR by Hour")
-    ax.set_xlabel("Hour of Day")
-    ax.set_ylabel("Click-Through Rate")
-    ax.yaxis.set_major_formatter(lambda value, _: f"{value:.2%}")
-    _save(fig, output_path)
-    return fig
-
-
 def plot_top_regions(summary: pd.DataFrame, output_path: Path | str | None = None, top_n: int = 15) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(12, 8))
     ordered = summary.sort_values("clicks", ascending=False).head(top_n).copy()
-    ordered["region"] = ordered["region"].astype(str)
-    sns.barplot(data=ordered, x="ctr", y="region", hue="region", dodge=False, legend=False, ax=ax, palette="Blues_r")
+    # Seaborn treats numeric `y` as a continuous axis; region codes must be categorical strings.
+    if "city" in ordered.columns and ordered["region"].duplicated().any():
+        ordered["region_label"] = ordered["region"].astype(str).str.cat(ordered["city"].astype(str), sep=" · ")
+    else:
+        ordered["region_label"] = ordered["region"].astype(str)
+    order = ordered.sort_values("ctr", ascending=True)["region_label"].tolist()
+    sns.barplot(
+        data=ordered,
+        x="ctr",
+        y="region_label",
+        order=order,
+        hue="region_label",
+        dodge=False,
+        legend=False,
+        ax=ax,
+        palette="Blues_r",
+    )
     ax.set_title(f"Top {top_n} Regions by CTR")
     ax.set_xlabel("CTR")
     ax.set_ylabel("Region")

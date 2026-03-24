@@ -59,12 +59,6 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 
 The pipeline saves figures under `outputs/figures/`. Below are example outputs from a pipeline run; each chart highlights a different slice of performance.
 
-### CTR by hour
-
-A line chart of CTR across hours of the day. I use it to see when users are most likely to click and how intraday patterns compare.
-
-![CTR by hour](docs/readme/ctr_by_hour.png)
-
 ### Region CTR comparison
 
 Horizontal bars of CTR for the top regions (by click volume). I use it to spot geographic pockets of strong or weak engagement.
