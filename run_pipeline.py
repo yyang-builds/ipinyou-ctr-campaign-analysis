@@ -23,7 +23,6 @@ from ipinyou_analysis.modeling import evaluate_models, train_ctr_models
 from ipinyou_analysis.plotting import (
     plot_bid_vs_payprice,
     plot_campaign_ecpc,
-    plot_top_regions,
     plot_win_rate_by_exchange,
 )
 
@@ -88,7 +87,6 @@ def write_summaries_and_plots(df: pd.DataFrame, processed_dir: Path, figure_dir:
     region_summary.to_csv(processed_dir / "region_summary.csv", index=False)
     exchange_summary.to_csv(processed_dir / "exchange_summary.csv", index=False)
 
-    plot_top_regions(region_summary, figure_dir / "top_regions_ctr.png")
     plot_campaign_ecpc(campaign_summary, figure_dir / "campaign_ecpc.png")
     plot_bid_vs_payprice(df, figure_dir / "bid_vs_payprice.png")
     plot_win_rate_by_exchange(exchange_summary, figure_dir / "win_rate_by_exchange.png")

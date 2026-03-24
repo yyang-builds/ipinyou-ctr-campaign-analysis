@@ -59,12 +59,6 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 
 The pipeline saves figures under `outputs/figures/`. Below are example outputs from a pipeline run; each chart highlights a different slice of performance.
 
-### Region CTR comparison
-
-A **lollipop chart** of CTR for the regions with the most clicks (top *N* by volume, then ordered by CTR). I use it to compare relative click rates without relying on a categorical bar axis.
-
-![Region CTR comparison](docs/readme/top_regions_ctr.png)
-
 ### eCPC by advertiser
 
 Effective CPC for the top advertisers (by clicks). I use it to compare which advertisers pay more per click given the same modeling window.
