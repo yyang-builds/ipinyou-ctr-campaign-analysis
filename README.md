@@ -49,31 +49,12 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 
 ## Business Questions
 
-These are the questions I designed the workflow around, with short takeaways (outputs depend on how much data you load).
-
-### Which campaigns and creatives drive the highest CTR?
-
-**Answer:** I rank **advertiser–creative–exchange** combinations using `campaign_summary.csv` from `campaign_performance_summary`. Each row includes **impressions**, **clicks**, and **CTR** (`clicks / impressions`). Sorting by **CTR** highlights high-click-rate line items; sorting by **clicks** or **impressions** shows scale. The **eCPC** chart (`campaign_ecpc.png`) complements this by comparing **effective CPC** among high-traffic advertisers so CTR is not read in a vacuum.
-
-### Which hours and regions consistently outperform or underperform?
-
-**Answer:** **Hours:** I aggregate by `hour` via `segment_performance_summary(df, ["hour"])` in notebooks (see `notebooks/01_eda_campaign_analysis.ipynb`) and inspect **CTR** and volume per hour after `build_modeling_frame` / `add_auction_metrics`. **Regions:** **`region_summary.csv`** (from `segment_performance_summary(df, ["region"])`) gives **CTR**, **clicks**, and **impressions** per region so I can compare pockets of strong or weak engagement. There is no single “hour chart” in the default pipeline anymore, but the hour breakdown is a few lines of aggregation in a notebook.
-
-### Which advertisers pay the most per click (eCPC) among high-traffic campaigns?
-
-**Answer:** Among advertisers with the most clicks, a wide spread in eCPC means some brands buy clicks much more cheaply than others at similar scale. The chart makes that gap obvious so I do not confuse “big volume” with “efficient clicks.”
-
-### Which exchanges show better win rates or lower effective CPC?
-
-**Answer:** I usually see a trade-off: exchanges with higher win rates are not always the ones with the lowest eCPC, so I read them together instead of picking a “winner” on one metric alone.
-
-### How does `bidprice` compare with `payprice`, and where might spend be inefficient?
-
-**Answer:** When clearing price sits far below my bid, I am leaving money on the table relative to what the auction actually needed; tight alignment along the diagonal is the sanity check that my bids match market clearing.
-
-### Which features are most associated with higher click probability?
-
-**Answer:** The models show whether the feature set is predictive on held-out data, but this project stops short of ranking individual features—treating “what matters most” would take a separate interpretability pass beyond the headline metrics.
+- Which campaigns and creatives drive the highest CTR?
+- Which hours and regions consistently outperform or underperform?
+- Which advertisers pay the most per click (eCPC) among high-traffic campaigns?
+- Which exchanges show better win rates or lower effective CPC?
+- How does `bidprice` compare with `payprice`, and where might spend be inefficient?
+- Which features are most associated with higher click probability?
 
 ## Visualizations
 
