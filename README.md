@@ -57,13 +57,37 @@ These seasons are the default focus because they include `advertiser` IDs and `u
 
 ## Visualizations
 
-The pipeline saves figures under `outputs/figures/`. Each chart highlights a different slice of performance:
+The pipeline saves figures under `outputs/figures/`. Below are example outputs from a pipeline run; each chart highlights a different slice of performance.
 
-- **CTR by hour** — A line chart of CTR across hours of the day. I use it to see when users are most likely to click and how intraday patterns compare.
-- **Region CTR comparison** — Horizontal bars of CTR for the top regions (by click volume). I use it to spot geographic pockets of strong or weak engagement.
-- **eCPC by advertiser** — Effective CPC for the top advertisers (by clicks). I use it to compare which advertisers pay more per click given the same modeling window.
-- **Bid price vs pay price** — A scatter of bid vs clearing price on a sample of auctions. I use it to see how aggressive bids are relative to what was actually paid and where gaps cluster.
-- **Win rate by ad exchange** — Win rate per exchange. I use it to compare how often impressions clear by supply source and where competition or fill might differ.
+### CTR by hour
+
+A line chart of CTR across hours of the day. I use it to see when users are most likely to click and how intraday patterns compare.
+
+![CTR by hour](docs/readme/ctr_by_hour.png)
+
+### Region CTR comparison
+
+Horizontal bars of CTR for the top regions (by click volume). I use it to spot geographic pockets of strong or weak engagement.
+
+![Region CTR comparison](docs/readme/top_regions_ctr.png)
+
+### eCPC by advertiser
+
+Effective CPC for the top advertisers (by clicks). I use it to compare which advertisers pay more per click given the same modeling window.
+
+![eCPC by advertiser](docs/readme/campaign_ecpc.png)
+
+### Bid price vs pay price
+
+A scatter of bid vs clearing price on a sample of auctions. I use it to see how aggressive bids are relative to what was actually paid and where gaps cluster.
+
+![Bid price vs pay price](docs/readme/bid_vs_payprice.png)
+
+### Win rate by ad exchange
+
+Win rate per exchange. I use it to compare how often impressions clear by supply source and where competition or fill might differ.
+
+![Win rate by ad exchange](docs/readme/win_rate_by_exchange.png)
 
 ## Project Structure
 
@@ -72,6 +96,8 @@ ipinyou-ctr-campaign-analysis/
 ├── data/
 │   ├── processed/
 │   └── raw/
+├── docs/
+│   └── readme/
 ├── models/
 ├── notebooks/
 ├── outputs/
